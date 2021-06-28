@@ -1,6 +1,7 @@
 package it.polito.tdp.yelp.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ public class Model {
 	private List<Adiacenza> archi;
 	private Business bMigliore;
 	private int migliore;
+	private List<Business> soluzione;
 	
 	
 	public Model() {
@@ -67,10 +69,12 @@ public class Model {
 			int entranti =0;
 			int uscenti =0;
 			for(DefaultWeightedEdge e: this.grafo.incomingEdgesOf(b)) {
+				
 				entranti+=this.grafo.getEdgeWeight(e);
 			}
 			for(DefaultWeightedEdge e: this.grafo.outgoingEdgesOf(b)) {
 				uscenti+=this.grafo.getEdgeWeight(e);
+				
 			}
 			peso=entranti-uscenti;
 			if(peso>migliore) {
@@ -82,6 +86,55 @@ public class Model {
 		return bMigliore;
 	}
 	
+	public Collection<Business> getVertexSet(){
+		return  idMap.values();
+	}
 	
+	public String cerca(Business partenza, Double soglia) {
+		
+		soluzione = new ArrayList<>();
+		List<Business> parziale= new ArrayList<>();
+		parziale.add(partenza);
+		
+		ricorsivo(parziale,soglia);
+		
+		
+		return soluzione.toString();
+		
+		
+		
+		
+		
+	}
+
+	private void ricorsivo(List<Business> parziale, Double soglia) {
+
+		
+		// TODO Auto-generated method stub
+		if(parziale.get(parziale.size()-1).equals(bMigliore)) {
+			if(parziale.size()<soluzione.size()||soluzione.size()==0) {
+				soluzione = new ArrayList<>(parziale);
+				return;
+			}
+			else {
+				return;
+			}
+		} else {
+		
+		for(DefaultWeightedEdge e: this.grafo.outgoingEdgesOf(parziale.get(parziale.size()-1))) {
+			Business ultimo =parziale.get(parziale.size()-1);
+			
+			if(this.grafo.getEdgeWeight(e)>=soglia) {
+				
+				Business b= Graphs.getOppositeVertex(this.grafo, e, parziale.get(parziale.size()-1));
+				parziale.add(b);
+				ricorsivo(parziale,soglia);
+				parziale.remove(parziale.size()-1);
+			}
+		}
+		
+		
+		}
+	}
 	
 }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.yelp.model.Business;
 import it.polito.tdp.yelp.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -46,14 +47,22 @@ public class FXMLController {
     private ComboBox<Integer> cmbAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbLocale"
-    private ComboBox<?> cmbLocale; // Value injected by FXMLLoader
+    private ComboBox<Business> cmbLocale; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
 
     @FXML
     void doCalcolaPercorso(ActionEvent event) {
-    	
+    	Business b= cmbLocale.getValue();
+    	String d_string = txtX.getText();
+    	try {
+    		double d = Double.parseDouble(d_string);
+    		txtResult.appendText(this.model.cerca(b, d));
+    	}
+    	catch(NumberFormatException e) {
+    		txtResult.appendText("\n Errore nell'inserimento della soglia ");
+    	}
     }
 
     @FXML
@@ -65,6 +74,8 @@ public class FXMLController {
     	if(anno!=0&&citta!="") {
     		this.model.creaGrafo(anno, citta);
     		txtResult.appendText("\nGrafo Creato\n"+"#vertici "+this.model.nVertici()+"\n#Archi"+this.model.nArchi());
+    		cmbLocale.getItems().clear();
+    		cmbLocale.getItems().addAll(this.model.getVertexSet());
     	}
 
     }
