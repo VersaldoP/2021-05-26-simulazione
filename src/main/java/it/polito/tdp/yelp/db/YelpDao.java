@@ -5,9 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import it.polito.tdp.yelp.model.Adiacenza;
 import it.polito.tdp.yelp.model.Business;
 import it.polito.tdp.yelp.model.Review;
 import it.polito.tdp.yelp.model.User;
@@ -179,6 +181,43 @@ public class YelpDao {
 			return ;
 		}
 		
+	}
+
+	public void getArchi(Map<String, Business> idMap, int anno, String citta, List<Adiacenza> archi) {
+		String sql = "SELECT  r1.business_id AS id1 , r2.business_id AS id2 ,(AVG(r1.stars)-AVG(r2.stars))AS peso "
+				+ "FROM reviews r1,reviews r2,business b1,business b2 "
+				+ "WHERE b1.city=? AND r1.business_id=b1.business_id AND YEAR(r1.review_date)=? "
+				+ "AND b2.city=b1.city AND r2.business_id = b2.business_id AND  YEAR(r2.review_date) =YEAR(r1.review_date) "
+				+ "AND b1.business_id> b2.business_id "
+				+ "GROUP BY id1,id2 "
+				+ "HAVING peso <> 0 ";
+				
+//		List<Adiacenza> result = new ArrayList<>();
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, citta);
+			st.setInt(2, anno);
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+				Business b1= idMap.get(res.getString("id1"));
+				Business b2= idMap.get(res.getString("id2"));
+//				if(b1!=null&&b2!=null)
+				archi.add(new Adiacenza(b1,b2,res.getInt("peso")));
+				
+			
+				
+			}
+			res.close();
+			st.close();
+			conn.close();
+			return ;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return  ;
+		}
 	}
 	
 }

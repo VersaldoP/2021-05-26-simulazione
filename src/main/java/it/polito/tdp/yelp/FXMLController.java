@@ -58,11 +58,22 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	txtResult.clear();
+    	int anno =0;
+    	String citta = cmbCitta.getValue();
+    	 anno = cmbAnno.getValue();
+    	if(anno!=0&&citta!="") {
+    		this.model.creaGrafo(anno, citta);
+    		txtResult.appendText("\nGrafo Creato\n"+"#vertici "+this.model.nVertici()+"\n#Archi"+this.model.nArchi());
+    	}
 
     }
 
     @FXML
     void doLocaleMigliore(ActionEvent event) {
+    	
+    	txtResult.appendText("\nIL locale migliore in passare la serata è : "+this.model.LocaleMigliore().toString());
+    	
 
     }
 
